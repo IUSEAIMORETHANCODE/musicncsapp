@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NCS Music Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+<style>
+
+/* ===== DESIGN SYSTEM ===== */
+:root {
+  --bg: #0f172a;
+  --surface: #111827;
+  --card: #1e293b;
+  --card-hover: #334155;
+
+  --accent: #ff0000;
+  --accent-soft: rgba(255, 0, 0, 0.15);
+
+  --text: #ffffff;
+  --muted: #94a3b8;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+
+  --shadow: 0 10px 30px rgba(0,0,0,0.4);
+  --transition: 0.25s ease;
+}
+
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: linear-gradient(180deg, #0f172a, #020617);
+  color: var(--text);
+}
+
+/* ===== HAMBURGER ===== */
+.hamburger {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  font-size: 28px;
+  cursor: pointer;
+  z-index: 1001;
+  display: none;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 240px;
+  height: 100vh;
+  background: var(--card);
+  padding: 80px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: var(--transition);
+  z-index: 1000;
+}
+
+.sidebar.active {
+  left: 0;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sidebar button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.sidebar button:hover {
+  background: var(--accent);
+}
+
+/* AUTH INSIDE SIDEBAR */
+.sidebar-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-auth button {
+  border: 1px solid #aaa;
+}
+
+/* ===== LAYOUT ===== */
+.layout {
+  display: flex;
+}
+
+/* ===== TIMELINE ===== */
+.timeline {
+  position: fixed;
+  left: 30px;
+  top: 0;
+  height: 100vh;
+  width: 120px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--accent), transparent);
+}
+
+.tick {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.tick:nth-child(1) { top: 100px; }
+.tick:nth-child(2) { top: 180px; }
+.tick:nth-child(3) { top: 260px; }
+.tick:nth-child(4) { top: 340px; }
+.tick:nth-child(5) { top: 420px; }
+
+.tick::before {
+  content: "";
+  width: 12px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.tick button {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--card);
+  color: white;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tick button:hover {
+  background: var(--accent);
+  transform: translateX(4px);
+}
+
+/* ===== MAIN ===== */
+.main {
+  margin-left: 140px;
+  width: 100%;
+  padding: var(--space-xl);
+  max-width: 1400px;
+}
+
+/* ===== HERO ===== */
+.hero {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.hero h1 {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(90deg, #ff0000, #ff4d4d, #ffffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  color: var(--muted);
+  margin-top: var(--space-sm);
+}
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.filter-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* GROUP DROPDOWNS */
+.filter-group {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.filter-icon {
+  font-size: 20px;
+  color: var(--accent);
+}
+
+/* DROPDOWN */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  min-width: 160px;
+  z-index: 999;
+}
+
+.dropdown.active .dropdown-menu {
+  display: flex;
+}
+
+.dropdown-menu div {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdown-menu div:hover {
+  background: var(--card-hover);
+}
+
+/* FILTER BUTTONS */
+.filter-buttons {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.filter-buttons button {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--card);
+  color: white;
+  cursor: pointer;
+}
+
+.filter-buttons button.active {
+  background: var(--accent);
+}
+
+/* CATEGORY DROPDOWN HIDDEN DESKTOP */
+.category-dropdown {
+  display: none;
+}
+
+/* ===== GRID ===== */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-lg);
+}
+
+/* ===== VIDEO CARD ===== */
+.video-card {
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--card);
+  transition: var(--transition);
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
+.video-card.hidden {
+  display: none !important;
+}
+
+.video-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow);
+}
+
+.thumbnail {
+  position: relative;
+}
+
+.thumbnail img {
+  width: 100%;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  opacity: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition);
+}
+
+.video-card:hover .overlay {
+  opacity: 1;
+}
+
+.play-icon {
+  font-size: 42px;
+}
+
+.duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.85);
+  padding: 3px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.video-info {
+  padding: var(--space-md);
+}
+
+.video-channel {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* AUTH */
+.auth {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.auth button {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #aaa;
+  background: transparent;
+  color: white;
+  cursor: pointer;
+}
+
+.auth button:hover {
+  background: var(--accent);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .timeline { display: none; }
+  .main { margin-left: 0; padding: var(--space-md); }
+  .hamburger { display: block; }
+  .auth { display: none; }
+}
+
+@media (max-width: 600px) {
+  .filter-buttons {
+    display: none;
+  }
+
+  .category-dropdown {
+    display: block;
+  }
+
+  .filter-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="auth">
+  <button>Login</button>
+  <button>Sign Up</button>
+</div>
+
+<i class='bx bx-menu hamburger' id="menuBtn"></i>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-nav">
+    <button>Home</button>
+    <button>Genres</button>
+    <button>Trending</button>
+    <button>New</button>
+    <button>Favorites</button>
+  </div>
+
+  <div class="sidebar-auth">
+    <button>Login</button>
+    <button>Sign Up</button>
+  </div>
+</div>
+
+<div class="layout">
+
+<div class="timeline">
+  <div class="tick"><button>Home</button></div>
+  <div class="tick"><button>Genres</button></div>
+  <div class="tick"><button>Trending</button></div>
+  <div class="tick"><button>New</button></div>
+  <div class="tick"><button>Favorites</button></div>
+</div>
+
+<div class="main">
+
+<div class="hero">
+  <h1>NCS Music Hub</h1>
+  <p>Discover music like a modern platform</p>
+</div>
+
+<div class="filter-bar">
+
+  <div class="filter-left">
+    <i class='bx bx-filter-alt filter-icon'></i>
+
+    <div class="filter-group">
+
+      <!-- FILTER TYPE -->
+      <div class="dropdown" id="dropdown">
+        <div class="dropdown-btn">
+          Filter by <i class='bx bx-chevron-down'></i>
+        </div>
+        <div class="dropdown-menu">
+          <div>Artist</div>
+          <div>Genre</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY DROPDOWN MOBILE -->
+      <div class="dropdown category-dropdown" id="categoryDropdown">
+        <div class="dropdown-btn">
+          Category <i class='bx bx-chevron-down'></i>
+        </div>
+        <div class="dropdown-menu">
+          <div data-category="all">All</div>
+          <div data-category="gaming">Gaming</div>
+          <div data-category="chill">Chill</div>
+          <div data-category="trap">Trap</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DESKTOP BUTTONS -->
+  <div class="filter-buttons">
+    <button class="active" data-category="all">All</button>
+    <button data-category="gaming">Gaming</button>
+    <button data-category="chill">Chill</button>
+    <button data-category="trap">Trap</button>
+  </div>
+
+</div>
+
+<div class="video-grid">
+
+<a href="https://www.youtube.com/watch?v=60ItHLz5WEA" target="_blank" class="video-card" data-category="gaming">
+  <div class="thumbnail">
+    <img src="https://img.youtube.com/vi/60ItHLz5WEA/hqdefault.jpg">
+    <div class="overlay"><i class='bx bx-play play-icon'></i></div>
+    <div class="duration">3:12</div>
+  </div>
+  <div class="video-info">
+    <div>Elektronomia - Sky High</div>
+    <div class="video-channel">NCS</div>
+  </div>
+</a>
+
+<a href="https://www.youtube.com/watch?v=fLexgOxsZu0" target="_blank" class="video-card" data-category="chill">
+  <div class="thumbnail">
+    <img src="https://img.youtube.com/vi/fLexgOxsZu0/hqdefault.jpg">
+    <div class="overlay"><i class='bx bx-play play-icon'></i></div>
+    <div class="duration">3:45</div>
+  </div>
+  <div class="video-info">
+    <div>Lensko - Circles</div>
+    <div class="video-channel">NCS</div>
+  </div>
+</a>
+
+</div>
+
+</div>
+</div>
+
+<script>
+// ===== FILTER LOGIC =====
+const buttons = document.querySelectorAll(".filter-buttons button");
+const cards = document.querySelectorAll(".video-card");
+
+function filter(category) {
+  buttons.forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(`[data-category="${category}"]`).forEach(b => b.classList.add("active"));
+
+  cards.forEach(card => {
+    const match = category === "all" || card.dataset.category === category;
+    card.classList.toggle("hidden", !match);
+  });
+}
+
+buttons.forEach(btn => {
+  btn.addEventListener("click", () => filter(btn.dataset.category));
+});
+
+// ===== CATEGORY DROPDOWN =====
+const categoryDropdown = document.getElementById("categoryDropdown");
+
+categoryDropdown.querySelectorAll(".dropdown-menu div").forEach(item => {
+  item.addEventListener("click", () => {
+    filter(item.dataset.category);
+    categoryDropdown.classList.remove("active");
+  });
+});
+
+// ===== DROPDOWN TOGGLES =====
+document.querySelectorAll(".dropdown-btn").forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    btn.parentElement.classList.toggle("active");
+  });
+});
+
+document.addEventListener("click", () => {
+  document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("active"));
+});
+
+// ===== SIDEBAR =====
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+
+menuBtn.onclick = () => {
+  sidebar.classList.toggle("active");
+};
+</script>
+
+</body>
+</html>
